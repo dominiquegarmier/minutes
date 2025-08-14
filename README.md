@@ -22,15 +22,15 @@ A Python CLI application that continuously records desktop audio, transcribes it
    ```bash
    # 1. Install Ollama
    curl -fsSL https://ollama.ai/install.sh | sh
-   
+
    # 2. Start Ollama in background and pull model
    ollama serve &
    ollama pull llama3.1:8b  # Best balance of quality/performance (4.7GB)
-   
+
    # 3. Install whisper-cli (choose one method)
    brew install whisper-cpp  # macOS
    # OR build from source: https://github.com/ggml-org/whisper.cpp
-   
+
    # 4. Download whisper model
    mkdir -p models && curl -L https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin -o models/ggml-base.en.bin
    ```
@@ -56,7 +56,7 @@ uv run python demo.py  # Test functionality
 
 The application uses a multi-threaded pipeline:
 1. **AudioRecorder** → Captures desktop audio in overlapping segments
-2. **Transcriber** → Processes audio through whisper.cpp subprocess  
+2. **Transcriber** → Processes audio through whisper.cpp subprocess
 3. **Aggregator** → Collects transcripts and triggers summarization
 4. **Summarizer** → Uses Ollama API for intelligent note generation
 5. **Writer** → Saves markdown files and maintains summary index

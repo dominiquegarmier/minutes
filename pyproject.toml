@@ -8,7 +8,7 @@ authors = [{name = "Dominique Garmier"}]
 dependencies = [
     "typer",
     "sounddevice",
-    "soundfile", 
+    "soundfile",
     "numpy",
     "requests",
 ]

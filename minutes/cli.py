@@ -35,7 +35,8 @@ def run(
         Path("./meeting-notes"), help="Directory to write minute notes and SUMMARY.md"
     ),
     device: Optional[str] = typer.Option(
-        None, help="Audio device numbers (comma-separated, e.g., '0,1,2') for capture (see --list-devices)"
+        None,
+        help="Audio device numbers (comma-separated, e.g., '0,1,2') for capture (see --list-devices)",
     ),
     sample_rate: int = typer.Option(
         DEFAULT_SR, help="Capture sample rate before resampling to 16k"
@@ -98,28 +99,30 @@ def run(
         for i, device in enumerate(devices):
             # Type cast for mypy - sounddevice returns dict-like objects
             dev_dict = dict(device)  # type: ignore[arg-type]
-            channels = dev_dict.get('max_input_channels', 0)
+            channels = dev_dict.get("max_input_channels", 0)
             if channels > 0:  # Only show input-capable devices
-                name = dev_dict.get('name', f'Device {i}')
+                name = dev_dict.get("name", f"Device {i}")
                 input_devices.append((i, name, channels))
-        
+
         for idx, (original_id, name, channels) in enumerate(input_devices):
             print(f"{idx:2d}: {name} ({channels} channels)")
-        
+
         # Show current system audio output
         try:
             default_output = sd.default.device[1]  # Output device
             if default_output is not None:
-                output_name = devices[default_output]['name']
+                output_name = devices[default_output]["name"]
                 print(f"\nCurrent system output: {output_name}")
                 if "BlackHole" not in output_name:
                     print("⚠️  System audio is NOT routed through BlackHole")
-                    print("   Set BlackHole 2ch as system output in Sound settings to capture system audio")
+                    print(
+                        "   Set BlackHole 2ch as system output in Sound settings to capture system audio"
+                    )
                 else:
                     print("✅ System audio is routed through BlackHole")
         except:
             pass
-            
+
         raise typer.Exit(code=0)
 
     if not whisper_model:

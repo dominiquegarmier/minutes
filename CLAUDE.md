@@ -33,7 +33,7 @@ uv run pytest tests/ -v
 # Type checking
 uv run mypy minutes/
 
-# Linting and formatting  
+# Linting and formatting
 uv run ruff check minutes/
 uv run ruff format minutes/
 uv run flake8 minutes/ --max-line-length=88 --extend-ignore=E203,W503

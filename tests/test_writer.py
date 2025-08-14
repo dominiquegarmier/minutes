@@ -27,7 +27,7 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             output_dir = Path(tmp_dir) / "new_dir"
             config = NotesWriterConfig(output_dir=output_dir)
-            
+
             assert not output_dir.exists()
             writer = NotesWriter(config)
             assert output_dir.exists()
@@ -38,9 +38,9 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             output_dir = Path(tmp_dir)
             config = NotesWriterConfig(output_dir=output_dir)
-            
+
             writer = NotesWriter(config)
-            
+
             assert writer.summary_file.exists()
             content = writer.summary_file.read_text(encoding="utf-8")
             assert content == "# Minutes Summary\n\n"
@@ -50,14 +50,14 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             output_dir = Path(tmp_dir)
             summary_file = output_dir / "SUMMARY.md"
-            
+
             # Pre-create summary file with content
             existing_content = "# Existing Summary\n\n- Previous entry\n"
             summary_file.write_text(existing_content, encoding="utf-8")
-            
+
             config = NotesWriterConfig(output_dir=output_dir)
             writer = NotesWriter(config)
-            
+
             # Should preserve existing content
             content = writer.summary_file.read_text(encoding="utf-8")
             assert content == existing_content
@@ -67,15 +67,15 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             test_content = "- First bullet point\n- Second bullet point"
             result_path = writer.write_minute(test_content)
-            
+
             assert result_path.exists()
             assert result_path.parent == Path(tmp_dir)
             assert result_path.name.startswith("minute_")
             assert result_path.suffix == ".md"
-            
+
             # Check file content
             content = result_path.read_text(encoding="utf-8")
             assert "---" in content  # Should have frontmatter
@@ -87,19 +87,19 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             result_path = writer.write_minute("Test content")
-            
+
             # Should match minute_YYYY-MM-DD_HH-MM-SS.md pattern
             filename = result_path.name
             assert filename.startswith("minute_")
             assert filename.endswith(".md")
-            
+
             # Extract timestamp part
             timestamp_part = filename[7:-3]  # Remove "minute_" and ".md"
             parts = timestamp_part.split("_")
             assert len(parts) == 2  # date_time
-            
+
             date_part, time_part = parts
             assert len(date_part.split("-")) == 3  # YYYY-MM-DD
             assert len(time_part.split("-")) == 3  # HH-MM-SS
@@ -109,10 +109,10 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             result_path = writer.write_minute("Content")
             content = result_path.read_text(encoding="utf-8")
-            
+
             lines = content.split("\n")
             assert lines[0] == "---"
             assert lines[1].startswith("created: ")
@@ -125,10 +125,10 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             content_with_whitespace = "  \n  - Point 1\n- Point 2  \n  "
             result_path = writer.write_minute(content_with_whitespace)
-            
+
             file_content = result_path.read_text(encoding="utf-8")
             # Should strip leading/trailing whitespace
             assert file_content.endswith("- Point 2\n")
@@ -139,13 +139,13 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             # Create a minute file
             note_path = Path(tmp_dir) / "minute_2024-01-01_12-00-00.md"
             note_path.write_text("Test content")
-            
+
             writer.append_summary(note_path, "Short description")
-            
+
             summary_content = writer.summary_file.read_text(encoding="utf-8")
             expected_line = "- [minute_2024-01-01_12-00-00.md](minute_2024-01-01_12-00-00.md) — Short description"
             assert expected_line in summary_content
@@ -155,22 +155,26 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             # Add multiple entries
             note1 = Path(tmp_dir) / "minute_1.md"
             note2 = Path(tmp_dir) / "minute_2.md"
-            
+
             writer.append_summary(note1, "First description")
             writer.append_summary(note2, "Second description")
-            
+
             summary_content = writer.summary_file.read_text(encoding="utf-8")
             assert "First description" in summary_content
             assert "Second description" in summary_content
-            
+
             # Should maintain order
             lines = summary_content.split("\n")
-            first_entry_line = next(i for i, line in enumerate(lines) if "First description" in line)
-            second_entry_line = next(i for i, line in enumerate(lines) if "Second description" in line)
+            first_entry_line = next(
+                i for i, line in enumerate(lines) if "First description" in line
+            )
+            second_entry_line = next(
+                i for i, line in enumerate(lines) if "Second description" in line
+            )
             assert first_entry_line < second_entry_line
 
     def test_append_summary_preserves_existing_content(self) -> None:
@@ -178,17 +182,19 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             output_dir = Path(tmp_dir)
             summary_file = output_dir / "SUMMARY.md"
-            
+
             # Pre-populate summary
-            existing_content = "# Minutes Summary\n\n- [existing.md](existing.md) — Existing entry\n"
+            existing_content = (
+                "# Minutes Summary\n\n- [existing.md](existing.md) — Existing entry\n"
+            )
             summary_file.write_text(existing_content, encoding="utf-8")
-            
+
             config = NotesWriterConfig(output_dir=output_dir)
             writer = NotesWriter(config)
-            
+
             note_path = Path(tmp_dir) / "new_note.md"
             writer.append_summary(note_path, "New entry")
-            
+
             final_content = writer.summary_file.read_text(encoding="utf-8")
             assert "Existing entry" in final_content
             assert "New entry" in final_content
@@ -197,28 +203,30 @@ class TestNotesWriter:
         """Test thread safety of summary append operations."""
         import threading
         import time
-        
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             def append_entries(thread_id):
                 for i in range(5):
                     note_path = Path(tmp_dir) / f"note_{thread_id}_{i}.md"
                     writer.append_summary(note_path, f"Description {thread_id}-{i}")
                     time.sleep(0.01)
-            
+
             # Run multiple threads appending to summary
-            threads = [threading.Thread(target=append_entries, args=(i,)) for i in range(3)]
+            threads = [
+                threading.Thread(target=append_entries, args=(i,)) for i in range(3)
+            ]
             for thread in threads:
                 thread.start()
-            
+
             for thread in threads:
                 thread.join()
-            
+
             # Check that all entries were written
             summary_content = writer.summary_file.read_text(encoding="utf-8")
-            
+
             # Should have 15 entries (3 threads * 5 entries each)
             entry_count = summary_content.count("— Description")
             assert entry_count == 15
@@ -228,13 +236,13 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             # Use absolute path for note
             note_path = Path(tmp_dir) / "test_note.md"
             writer.append_summary(note_path, "Test description")
-            
+
             summary_content = writer.summary_file.read_text(encoding="utf-8")
-            
+
             # Should use just the filename, not absolute path
             assert "[test_note.md](test_note.md)" in summary_content
             assert str(tmp_dir) not in summary_content
@@ -244,11 +252,13 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             note_path = Path(tmp_dir) / "note.md"
-            special_description = "Description with [brackets] and (parentheses) & symbols"
+            special_description = (
+                "Description with [brackets] and (parentheses) & symbols"
+            )
             writer.append_summary(note_path, special_description)
-            
+
             summary_content = writer.summary_file.read_text(encoding="utf-8")
             assert special_description in summary_content
 
@@ -257,9 +267,9 @@ class TestNotesWriter:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = NotesWriterConfig(output_dir=Path(tmp_dir))
             writer = NotesWriter(config)
-            
+
             note_path = Path(tmp_dir) / "note.md"
             writer.append_summary(note_path, "")
-            
+
             summary_content = writer.summary_file.read_text(encoding="utf-8")
             assert "[note.md](note.md) — " in summary_content

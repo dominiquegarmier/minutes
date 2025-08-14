@@ -116,7 +116,7 @@ class TestLinearResampleMono:
         dst_sr = 16000
         t = np.linspace(0, duration, int(src_sr * duration), endpoint=False)
         signal = np.sin(2 * np.pi * 440 * t)  # 440Hz sine wave
-        
+
         result = linear_resample_mono(signal, src_sr, dst_sr)
         expected_length = int(dst_sr * duration)
         assert len(result) == expected_length
