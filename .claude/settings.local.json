@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run pytest tests/test_aggregation.py::TestMinuteAggregator::test_short_description_with_markers -v)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run mypy:*)",
+      "Bash(uv run:*)",
+      "WebFetch(domain:ollama.com)",
+      "Bash(timeout 10 uv run:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

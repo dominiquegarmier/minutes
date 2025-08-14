@@ -1,0 +1,24 @@
+[project]
+name = "minutes"
+version = "0.1.0"
+description = "CLI application for generating minute meeting notes from desktop audio recording"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{name = "Dominique Garmier"}]
+dependencies = [
+    "typer",
+    "sounddevice",
+    "soundfile", 
+    "numpy",
+    "requests",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "mypy", "ruff", "types-requests", "pre-commit", "flake8"]
+
+[project.scripts]
+minutes = "minutes.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
